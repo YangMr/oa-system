@@ -43,8 +43,9 @@ export default{
   },
   methods : {
     async getMenuList(){
-      const {menuList} = await UserModel.getPermissionList()
+      const {menuList,actionList} = await UserModel.getPermissionList()
       this.$store.commit("saveMenuList",menuList)
+      this.$store.commit("saveActionList",actionList)
     }
   }
 }
