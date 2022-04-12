@@ -4,8 +4,24 @@
  */
 import router from "./router"
 import store from "./store"
+import UserModel from "./api/user";
+import utils from "./utils/utils";
 
-router.beforeEach((to,from,next)=>{
+async function loadRouter(){
+  const {menuList} =await UserModel.getPermissionList()
+  const routes = utils.generateRoute(menuList)
+  routes.forEach((item,index)=>{
+    router.addRoute("layout",{
+      path : item.path,
+      name : item.name.toLowerCase(),
+      meta : item.meta,
+      component :  () => import(`./views/${item.component.toLowerCase()}`)
+    })
+  })
+}
+
+
+router.beforeEach(async (to,from,next)=>{
   const token = store.state.userInfo.token
   if(!token){
     if(to.path === "/login"){
@@ -17,7 +33,8 @@ router.beforeEach((to,from,next)=>{
     if(to.path === "/login"){
       next(from.path)
     }else{
-      next()
+      await next()
+      await loadRouter()
     }
   }
 
