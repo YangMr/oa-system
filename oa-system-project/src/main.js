@@ -10,6 +10,9 @@ Vue.use(ElementUI);
 import "./permissions"
 import "./directive/buttonPermissions"
 
+import dayjs from "dayjs"
+Vue.prototype.dayjs = dayjs
+
 Vue.config.productionTip = false;
 
 new Vue({
