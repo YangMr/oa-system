@@ -1,46 +1,35 @@
 <template>
   <div class="user">
     <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <el-button type="primary" size="mini">新增</el-button>
-        <el-button type="danger" size="mini">批量删除</el-button>
-      </div>
-
-      <el-table
-        ref="multipleTable"
-        :data="tableData"
-        tooltip-effect="dark"
-        style="width: 100%"
-        size="mini"
-        >
-        <el-table-column type="selection" width="55"></el-table-column>
-        <!--<el-table-column v-for="(item,index) in columns" :key="index"  :label="item.label" :prop="item.prop"></el-table-column>-->
-        <el-table-column v-for="(item,index) in columns" :key="index" v-bind="item"></el-table-column>
-        <el-table-column label="操作" width="150">
-          <template slot-scope="scope">
-            <el-button size="mini">编辑</el-button>
-            <el-button size="mini" type="danger" >删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <el-pagination @current-change="handleCurrentChange" :page-size="pageSize" :current-page="pageNum" background layout="prev, pager, next" :total="total"></el-pagination>
+      <BaseTable @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
+        <div slot="action" class="clearfix">
+          <el-button type="primary" size="mini">新增</el-button>
+          <el-button type="danger" size="mini">批量删除</el-button>
+        </div>
+      </BaseTable>
     </el-card>
   </div>
 </template>
 
 <script>
 import UserModel from "../../api/user"
+import BaseTable from "../../components/common/BaseTable"
 export default {
   name: "index",
   data(){
     return {
+      pager : {
+        pageNum : 1,
+        pageSize : 5,
+        total : 0,
+      },
       tableData : [],
-      pageNum : 1,
-      pageSize : 5,
       state : 0,
-      total : 0,
       columns : [
+        {
+          type : "selection",
+          width : "55"
+        },
         {
           label : "用户ID",
           prop : "userId",
@@ -76,6 +65,25 @@ export default {
           formatter : (row, column, value, index)=>{
             return this.dayjs(value).format("YYYY-MM-DD HH:mm:ss")
           }
+        },
+        {
+          type : "action",
+          label : "操作",
+          width : "150",
+          list : [
+            {
+              text : "编辑",
+              size : "mini",
+              type : "default",
+              action : "edit"
+            },
+            {
+              text : "删除",
+              size : "mini",
+              type : "danger",
+              action : "delete"
+            }
+          ]
         }
       ]
     }
@@ -86,18 +94,27 @@ export default {
   methods : {
     async initList(){
       const obj = {
-        pageNum : this.pageNum,
-        pageSize : this.pageSize,
+        pageNum : this.pager.pageNum,
+        pageSize : this.pager.pageSize,
         state : this.state
       }
       const {list,page} = await UserModel.userList(obj)
       this.tableData = list
-      this.total = page.total
+      this.pager.total = page.total
     },
     handleCurrentChange(val){
-      this.pageNum = val
+      this.pager.pageNum = val
       this.initList()
+    },
+    handleEdit(row){
+      console.log("edit=>",row)
+    },
+    handleDelete(row){
+      console.log("delete=>",row)
     }
+  },
+  components : {
+    BaseTable
   }
 }
 </script>
@@ -107,10 +124,5 @@ export default {
   ::v-deep .el-card__body{
     padding : 10px !important;
   }
-}
-
-.el-pagination{
-  text-align: right;
-  padding-top:10px;
 }
 </style>
