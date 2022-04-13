@@ -94,5 +94,12 @@ export default {
       margin-left : 20px;
     }
   }
+
+
+}
+.view{
+  padding : 20px;
+  height : calc(100% - 51px);
+  box-sizing: border-box;
 }
 </style>
