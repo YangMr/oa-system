@@ -27,6 +27,9 @@ const routes = [
         path : "welcome",
         name : "welcome",
         component: () => import('../views/welcome'),
+        meta : {
+          title : "欢迎体验Vue2全栈课程"
+        }
       },
       // {
       //   path : "/system/user",
@@ -66,9 +69,6 @@ const routes = [
     ]
   }
 ];
-
-
-
 
 const router = new VueRouter({
   routes,
