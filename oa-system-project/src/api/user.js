@@ -31,8 +31,18 @@ const userList = (data)=>{
   return request({url : "/users/list", method : "GET",  data})
 }
 
+/**
+ * 删除用户与批量删除用户接口
+ * @param data  array
+ * @returns {AxiosPromise}
+ */
+const deleteUser = (data)=>{
+  return request({url : "/users/delete", method : "POST",  data})
+}
+
 export default {
   login,
   getPermissionList,
-  userList
+  userList,
+  deleteUser
 }

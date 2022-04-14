@@ -10,6 +10,7 @@
       tooltip-effect="dark"
       style="width: 100%"
       size="mini"
+      @selection-change="handleSelectionChange"
     >
 
       <!--<el-table-column v-for="(item,index) in columns" :key="index"  :label="item.label" :prop="item.prop"></el-table-column>-->
@@ -58,6 +59,9 @@ export default {
       }else if(action === 'delete'){
         this.$emit("handleDelete",row)
       }
+    },
+    handleSelectionChange(row){
+      this.$emit("handleSelectionChange",row)
     }
   }
 }

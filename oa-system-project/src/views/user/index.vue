@@ -1,10 +1,12 @@
 <template>
   <div class="user">
+    <QueryForm v-model="form" :formColumns="formColumns" @handleSearch="searchForm" @handleReset="resetForm"></QueryForm>
+
     <el-card class="box-card">
-      <BaseTable @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
+      <BaseTable @handleSelectionChange="handleSelectionChange" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
         <div slot="action" class="clearfix">
           <el-button type="primary" size="mini">新增</el-button>
-          <el-button type="danger" size="mini">批量删除</el-button>
+          <el-button type="danger" size="mini" @click="handleDelete">批量删除</el-button>
         </div>
       </BaseTable>
     </el-card>
@@ -14,6 +16,7 @@
 <script>
 import UserModel from "../../api/user"
 import BaseTable from "../../components/common/BaseTable"
+import QueryForm from "../../components/common/QueryForm"
 export default {
   name: "index",
   data(){
@@ -24,7 +27,6 @@ export default {
         total : 0,
       },
       tableData : [],
-      state : 0,
       columns : [
         {
           type : "selection",
@@ -85,7 +87,37 @@ export default {
             }
           ]
         }
-      ]
+      ],
+      form : {
+        userId : "",
+        userName : "",
+        state : 0,
+      },
+      formColumns : {
+        ref : "form",
+        inline : true,
+        size : "mini",
+        columns : [
+          {
+            label : "用户ID",
+            placeholder : "请输入用户id",
+            type : "text",
+            prop : "userId"
+          },
+          {
+            label : "用户名称",
+            placeholder : "请输入用户名称",
+            type : "text",
+            prop : "userName"
+          },
+          {
+            label : "状态",
+            type : "select",
+            prop : "state"
+          }
+        ]
+      },
+      checkIds : []
     }
   },
   created(){
@@ -96,7 +128,7 @@ export default {
       const obj = {
         pageNum : this.pager.pageNum,
         pageSize : this.pager.pageSize,
-        state : this.state
+        ...this.form
       }
       const {list,page} = await UserModel.userList(obj)
       this.tableData = list
@@ -109,18 +141,48 @@ export default {
     handleEdit(row){
       console.log("edit=>",row)
     },
-    handleDelete(row){
-      console.log("delete=>",row)
+    async handleDelete(row){
+      this.$confirm('确认删除此用户吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        this.checkIds.push(row.userId)
+        const response = await UserModel.deleteUser({userIds : this.checkIds})
+        this.initList()
+        this.checkIds = []
+        this.$message({type: 'success', message: '删除成功!'});
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+
+    },
+    handleSelectionChange(row){
+      this.checkIds = row.map((item,index)=>item.userId)
+    },
+    searchForm(){
+      this.pager.pageNum = 1
+      this.initList()
+    },
+    resetForm(){
+      this.pager.pageNum = 1
+      this.initList()
+      // this.$refs[this.formColumns.ref].resetFields();
     }
   },
   components : {
-    BaseTable
+    BaseTable,
+    QueryForm
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .el-card{
+  margin-top:20px;
   ::v-deep .el-card__body{
     padding : 10px !important;
   }
