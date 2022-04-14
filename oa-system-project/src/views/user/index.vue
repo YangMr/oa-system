@@ -11,13 +11,14 @@
       </BaseTable>
     </el-card>
 
-    <DiaLog v-model="diaLogForm" :dialogColumns="dialogColumns"></DiaLog>
+    <DiaLog :resetDialogForm="resetDialogForm" @handleSubmit="handleSubmit" v-model="diaLogForm" :dialogColumns="dialogColumns"></DiaLog>
   </div>
 </template>
 
 <script>
 import UserModel from "../../api/user"
 import RoleModel from "../../api/role"
+import DeptModel from "../../api/dept"
 import BaseTable from "../../components/common/BaseTable"
 import QueryForm from "../../components/common/QueryForm"
 import DiaLog from "../../components/common/DiaLog"
@@ -127,6 +128,11 @@ export default {
         dialogFormVisible : false,
         labelWidth : "100px",
         size : "mini",
+        rules : {
+          userName : [{required : true, message : "请输入用户名称", trigger : "blur"}],
+          userEmail : [{required : true, message : "请输入用户邮箱", trigger : "blur"}],
+          deptId : [{required : true, message : "请选择部门", trigger : "change"}],
+        },
         columns: [
           {
             label : "用户名",
@@ -158,9 +164,9 @@ export default {
             prop : "state",
             placeholder : "请选择状态",
             options : [
-              {value : "1", label : "在职"},
-              {value : "2", label : "离职"},
-              {value : "3", label : "试用期"}
+              {value : 1, label : "在职"},
+              {value : 2, label : "离职"},
+              {value : 3, label : "试用期"}
             ]
           },
           {
@@ -190,8 +196,8 @@ export default {
     dialogStatus : {
       handler(newValue,oldValue){
         if(newValue){
-          console.log("456")
           this.initRolesAllList()
+          this.initDeptList()
         }
       }
     }
@@ -212,7 +218,18 @@ export default {
       this.initList()
     },
     handleEdit(row){
-      console.log("edit=>",row)
+      this.dialogColumns.title = "用户编辑"
+      this.diaLogForm = {
+        userName : row.userName,
+        userEmail : row.userEmail,
+        mobile : row.mobile,
+        job : row.job,
+        state : row.state,
+        roleList : row.roleList[0],
+        deptId : row.deptId,
+        userId : row.userId
+      }
+      this.openDialog()
     },
     async handleDelete(row){
       this.$confirm('确认删除此用户吗?', '提示', {
@@ -243,29 +260,61 @@ export default {
     resetForm(){
       this.pager.pageNum = 1
       this.initList()
-      // this.$refs[this.formColumns.ref].resetFields();
+
     },
     async initRolesAllList(){
       const response = await RoleModel.rolesAllList()
-      console.log("response=>",response)
-      // {_id: '609781cf5ccd183084f8ea40', roleName: '测试'}
-      // {value : '609781cf5ccd183084f8ea40' , label : "测试"}
       this.dialogColumns.columns.forEach(item=>{
         if(item.prop === 'roleList'){
-          console.log("item=>",item)
           item.options = response.map(item=>{
             return {
               value : item._id,
               label : item.roleName
             }
           })
-          console.log("options=>",item.options)
         }
       })
+    },
+    async initDeptList(){
+      const response = await DeptModel.deptList()
+      this.dialogColumns.columns.forEach(item=>{
+        if(item.prop === 'deptId'){
+          console.log("===>",item)
+          item.options = response
+        }
+      })
+      console.log("==>",this.dialogColumns.columns)
     },
     openDialog(){
       this.dialogColumns.dialogFormVisible = true
       this.dialogStatus = true
+    },
+    async handleSubmit(value){
+      if(value === 'add'){
+        this.diaLogForm.action = 'add'
+        const response = await UserModel.actionUser(this.diaLogForm)
+        this.dialogColumns.dialogFormVisible = false
+        this.initList()
+      }else if(value === 'edit'){
+        this.diaLogForm.action = 'edit'
+        const response = await UserModel.actionUser(this.diaLogForm)
+        this.dialogColumns.dialogFormVisible = false
+        this.initList()
+      }
+      this.resetDialogForm()
+    },
+    resetDialogForm(){
+      this.dialogColumns.dialogFormVisible = false
+      this.diaLogForm = {
+        userName : "",
+        userEmail : "",
+        mobile : "",
+        job :"",
+        state :"",
+        roleList : "",
+        deptId : "",
+        userId : ""
+      }
     }
   },
   components : {

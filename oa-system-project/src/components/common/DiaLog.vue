@@ -1,6 +1,6 @@
 <template>
   <el-dialog :title="dialogColumns.title" :visible.sync="dialogColumns.dialogFormVisible">
-    <el-form :model="value" v-bind="dialogColumns">
+    <el-form :rules="dialogColumns.rules" :model="value" v-bind="dialogColumns">
       <template v-for="(item,index) in dialogColumns.columns">
         <el-form-item v-if="item.type === 'text'" v-bind="item">
           <el-input v-model="value[item.prop]" v-bind="item"></el-input>
@@ -16,15 +16,15 @@
           </el-select>
         </el-form-item>
         <el-form-item v-bind="item" v-else-if="item.type === 'cascader'">
-          <el-cascader :options="item.options" :props="{ checkStrictly: true }" clearable></el-cascader>
+          <el-cascader v-model="value[item.prop]" :options="item.options" :props="{ checkStrictly: true , value : '_id', label : 'deptName'}" clearable></el-cascader>
         </el-form-item>
       </template>
 
 
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogColumns.dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogColumns.dialogFormVisible = false">确 定</el-button>
+      <el-button @click="handleReset">取 消</el-button>
+      <el-button type="primary" @click="handleSubmit">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -40,6 +40,19 @@ export default {
     dialogColumns : {
       type : Object,
       default : {}
+    },
+    resetDialogForm : Function
+  },
+  methods : {
+    handleSubmit(){
+      if(this.value.userId){
+        this.$emit("handleSubmit","edit")
+      }else{
+        this.$emit("handleSubmit","add")
+      }
+    },
+    handleReset(){
+      this.resetDialogForm()
     }
   }
 }

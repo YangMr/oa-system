@@ -40,9 +40,19 @@ const deleteUser = (data)=>{
   return request({url : "/users/delete", method : "POST",  data})
 }
 
+/**
+ * 新增用户与编辑用户接口
+ * @param data
+ * @returns {AxiosPromise}
+ */
+const actionUser = (data)=>{
+  return request({url : "/users/operate", method : "POST", data})
+}
+
 export default {
   login,
   getPermissionList,
   userList,
-  deleteUser
+  deleteUser,
+  actionUser
 }
