@@ -5,18 +5,22 @@
     <el-card class="box-card">
       <BaseTable @handleSelectionChange="handleSelectionChange" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
         <div slot="action" class="clearfix">
-          <el-button type="primary" size="mini">新增</el-button>
+          <el-button type="primary" size="mini" @click="openDialog">新增</el-button>
           <el-button type="danger" size="mini" @click="handleDelete">批量删除</el-button>
         </div>
       </BaseTable>
     </el-card>
+
+    <DiaLog v-model="diaLogForm" :dialogColumns="dialogColumns"></DiaLog>
   </div>
 </template>
 
 <script>
 import UserModel from "../../api/user"
+import RoleModel from "../../api/role"
 import BaseTable from "../../components/common/BaseTable"
 import QueryForm from "../../components/common/QueryForm"
+import DiaLog from "../../components/common/DiaLog"
 export default {
   name: "index",
   data(){
@@ -117,11 +121,80 @@ export default {
           }
         ]
       },
-      checkIds : []
+      checkIds : [],
+      dialogColumns : {
+        title : "用户新增",
+        dialogFormVisible : false,
+        labelWidth : "100px",
+        size : "mini",
+        columns: [
+          {
+            label : "用户名",
+            type : "text",
+            prop : "userName",
+            placeholder : "请输入用户名称"
+          },
+          {
+            label : "邮箱",
+            type : "email",
+            prop : "userEmail",
+            placeholder : "请输入用户邮箱",
+          },
+          {
+            label : "手机号",
+            type : "text",
+            prop : "mobile",
+            placeholder : "请输入手机号"
+          },
+          {
+            label : "岗位",
+            type : "text",
+            prop : "job",
+            placeholder : "请输入岗位"
+          },
+          {
+            label : "状态",
+            type : "select",
+            prop : "state",
+            placeholder : "请选择状态",
+            options : [
+              {value : "1", label : "在职"},
+              {value : "2", label : "离职"},
+              {value : "3", label : "试用期"}
+            ]
+          },
+          {
+            label : "系统角色",
+            type : "select",
+            prop : "roleList",
+            placeholder : "请选择系统角色",
+            options : []
+          },
+          {
+            label : "部门",
+            type : "cascader",
+            prop : "deptId",
+            placeholder : "请选择部门",
+            options : []
+          }
+        ]
+      },
+      diaLogForm : {},
+      dialogStatus : false
     }
   },
   created(){
     this.initList()
+  },
+  watch : {
+    dialogStatus : {
+      handler(newValue,oldValue){
+        if(newValue){
+          console.log("456")
+          this.initRolesAllList()
+        }
+      }
+    }
   },
   methods : {
     async initList(){
@@ -171,11 +244,34 @@ export default {
       this.pager.pageNum = 1
       this.initList()
       // this.$refs[this.formColumns.ref].resetFields();
+    },
+    async initRolesAllList(){
+      const response = await RoleModel.rolesAllList()
+      console.log("response=>",response)
+      // {_id: '609781cf5ccd183084f8ea40', roleName: '测试'}
+      // {value : '609781cf5ccd183084f8ea40' , label : "测试"}
+      this.dialogColumns.columns.forEach(item=>{
+        if(item.prop === 'roleList'){
+          console.log("item=>",item)
+          item.options = response.map(item=>{
+            return {
+              value : item._id,
+              label : item.roleName
+            }
+          })
+          console.log("options=>",item.options)
+        }
+      })
+    },
+    openDialog(){
+      this.dialogColumns.dialogFormVisible = true
+      this.dialogStatus = true
     }
   },
   components : {
     BaseTable,
-    QueryForm
+    QueryForm,
+    DiaLog
   }
 }
 </script>
