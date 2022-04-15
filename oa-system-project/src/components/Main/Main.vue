@@ -54,8 +54,10 @@ export default {
       this.$store.commit("saveUserInfo","")
       // 清除本地的token 与用户信息
       storage.clearItem("userInfo")
+
       // 跳转到登录页
       this.$router.push("/login")
+
     }
   }
 }

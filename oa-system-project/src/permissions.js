@@ -18,9 +18,10 @@ async function loadRouter(){
       component :  () => import(`./views/${item.component.toLowerCase()}`)
     })
   })
+
 }
 
-
+// loadRouter()
 router.beforeEach(async (to,from,next)=>{
   const token = store.state.userInfo.token
   if(!token){

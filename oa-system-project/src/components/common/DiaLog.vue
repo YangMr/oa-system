@@ -16,12 +16,14 @@
           </el-select>
         </el-form-item>
         <el-form-item v-bind="item" v-else-if="item.type === 'cascader'">
+          {{value[item.prop]}}
           <el-cascader v-model="value[item.prop]" :options="item.options" :props="{ checkStrictly: true , value : item.params.value, label :  item.params.label,}" clearable></el-cascader>
         </el-form-item>
-        <el-form-item v-else-if="item.type === 'radio'" v-bind="item">
-          <el-radio-group v-model="value[item.prop]">
-            <el-radio v-for="(item,index) in item.options" :key="index" :label="item.label" :value="item.value"></el-radio>
-          </el-radio-group>
+        <el-form-item v-else-if="item.prop === 'menuType'" v-bind="item">
+          <el-radio v-model="value[item.prop]" v-for="(mitem,index) in item.options"  :key="index" :label="mitem.value">{{mitem.label}}</el-radio>
+        </el-form-item>
+        <el-form-item v-else-if="item.prop === 'menuState'" v-bind="item">
+          <el-radio v-model="value[item.prop]" v-for="(mitem,index) in item.options"  :key="index" :label="mitem.value">{{mitem.label}}</el-radio>
         </el-form-item>
       </template>
 
@@ -50,6 +52,7 @@ export default {
   },
   methods : {
     handleSubmit(){
+      console.log(this.value)
       if(this.value.userId){
         this.$emit("handleSubmit","edit")
       }else{
@@ -58,7 +61,10 @@ export default {
     },
     handleReset(){
       this.resetDialogForm()
-    }
+    },
+    // handleChange(row){
+    //   console.log("value",row)
+    // }
   }
 }
 </script>

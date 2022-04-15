@@ -3,14 +3,14 @@
     <QueryForm v-model="form" :formColumns="formColumns" @handleSearch="searchForm" @handleReset="resetForm"></QueryForm>
 
     <el-card class="box-card">
-      <BaseTable @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :pagination="pagination" :pager="{}" :tree="tree" :tableData="tableData">
+      <BaseTable @handleAdd="handleAdd" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :pagination="pagination" :pager="{}" :tree="tree" :tableData="tableData">
         <div slot="action" class="clearfix">
           <el-button type="primary" size="mini" @click="openDialog">新增</el-button>
         </div>
       </BaseTable>
     </el-card>
 
-    <DiaLog :resetDialogForm="resetDialogForm" @handleSubmit="handleSubmit" v-model="diaLogForm" :dialogColumns="dialogColumns"></DiaLog>
+    <DiaLog  :resetDialogForm="resetDialogForm" @handleSubmit="handleSubmit" v-model="diaLogForm" :dialogColumns="dialogColumns"></DiaLog>
   </div>
 </template>
 
@@ -129,17 +129,16 @@ export default {
         "row_id" : "_id",
         "tree_props" : {children : 'children'}
       },
-      diaLogForm : {},
+      diaLogForm : {
+        menuType : 1,
+        menuState : 1,
+        parentId : [null]
+      },
       dialogColumns : {
         title : "菜单新增",
         dialogFormVisible : false,
         labelWidth : "100px",
         size : "mini",
-        rules : {
-          userName : [{required : true, message : "请输入用户名称", trigger : "blur"}],
-          userEmail : [{required : true, message : "请输入用户邮箱", trigger : "blur"}],
-          deptId : [{required : true, message : "请选择部门", trigger : "change"}],
-        },
         columns: [
           {
             label : "父级菜单",
@@ -185,7 +184,7 @@ export default {
           {
             label : "菜单状态",
             type : "radio",
-            prop : "menuType",
+            prop : "menuState",
             options : [
               {value : 1, label : "正常"},
               {value : 0, label : "停用"}
@@ -197,7 +196,6 @@ export default {
   },
   created() {
     this.initList()
-
   },
   methods : {
     async initList(){
@@ -211,7 +209,11 @@ export default {
     resetForm(){
       this.initList()
     },
-    handleEdit(){},
+    handleEdit(row){
+      this.dialogColumns.title = "菜单编辑"
+      this.diaLogForm = {...row,userId : 1}
+      this.dialogColumns.dialogFormVisible = true
+    },
     async handleDelete(row){
       const data = {action : "delete", _id : row._id}
       const response = await MenuModel.actionMenu(data)
@@ -223,13 +225,33 @@ export default {
       this.dialogColumns.dialogFormVisible = true
     },
     resetDialogForm(){},
-    handleSubmit(){},
+    async handleSubmit(row){
+      if(row === 'add'){
+        this.diaLogForm.action = "add"
+        const response = await MenuModel.actionMenu(this.diaLogForm)
+        this.dialogColumns.dialogFormVisible = false
+        this.initList()
+        this.resetDialogForm()
+      }else if(row === 'edit'){
+        console.log("edit=>>>",row)
+        this.diaLogForm.action = "edit"
+        const response = await MenuModel.actionMenu(this.diaLogForm)
+        this.dialogColumns.dialogFormVisible = false
+        this.initList()
+        this.resetDialogForm()
+      }
+    },
     initOptions(){
       this.dialogColumns.columns.forEach(item=>{
         if(item.prop === 'parentId'){
           item.options = this.tableData
         }
       })
+    },
+    handleAdd(row){
+      this.diaLogForm.parentId = row.parentId
+      this.handleSubmit()
+      this.dialogColumns.dialogFormVisible = true
     }
   },
   components : {

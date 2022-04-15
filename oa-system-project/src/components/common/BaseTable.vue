@@ -66,6 +66,8 @@ export default {
         this.$emit("handleRoLe",row)
       }else if(action === 'delete'){
         this.$emit("handleDelete",row)
+      }else if(action === 'add'){
+        this.$emit("handleAdd",row)
       }
     },
     handleSelectionChange(row){
