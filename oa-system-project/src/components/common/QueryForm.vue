@@ -7,10 +7,7 @@
         </el-form-item>
         <el-form-item v-else-if="item.type === 'select'" v-bind="item">
           <el-select v-model="value[item.prop]">
-            <el-option :value="0" label="所有"></el-option>
-            <el-option :value="1" label="在职"></el-option>
-            <el-option :value="2" label="离职"></el-option>
-            <el-option :value="3" label="试用期"></el-option>
+            <el-option v-for="(item,index) in item.options" :key="item.value" :value="item.value" :label="item.label"></el-option>
           </el-select>
         </el-form-item>
       </template>

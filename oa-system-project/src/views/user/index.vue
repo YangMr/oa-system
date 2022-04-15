@@ -3,7 +3,7 @@
     <QueryForm v-model="form" :formColumns="formColumns" @handleSearch="searchForm" @handleReset="resetForm"></QueryForm>
 
     <el-card class="box-card">
-      <BaseTable @handleSelectionChange="handleSelectionChange" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
+      <BaseTable :tree="{}" @handleSelectionChange="handleSelectionChange" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleCurrentChange="handleCurrentChange" :columns="columns" :tableData="tableData" :pager="pager">
         <div slot="action" class="clearfix">
           <el-button type="primary" size="mini" @click="openDialog">新增</el-button>
           <el-button type="danger" size="mini" @click="handleDelete">批量删除</el-button>
@@ -118,7 +118,25 @@ export default {
           {
             label : "状态",
             type : "select",
-            prop : "state"
+            prop : "state",
+            options : [
+              {
+                value : 0,
+                label : "所有"
+              },
+              {
+                value : 1,
+                label : "在职"
+              },
+              {
+                value : 2,
+                label : "离职"
+              },
+              {
+                value : 3,
+                label : "试用期"
+              }
+            ]
           }
         ]
       },
@@ -181,7 +199,8 @@ export default {
             type : "cascader",
             prop : "deptId",
             placeholder : "请选择部门",
-            options : []
+            options : [],
+            params : {value : "_id", label : 'deptName'}
           }
         ]
       },
@@ -283,7 +302,6 @@ export default {
           item.options = response
         }
       })
-      console.log("==>",this.dialogColumns.columns)
     },
     openDialog(){
       this.dialogColumns.dialogFormVisible = true

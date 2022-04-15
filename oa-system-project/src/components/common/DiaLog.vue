@@ -16,7 +16,12 @@
           </el-select>
         </el-form-item>
         <el-form-item v-bind="item" v-else-if="item.type === 'cascader'">
-          <el-cascader v-model="value[item.prop]" :options="item.options" :props="{ checkStrictly: true , value : '_id', label : 'deptName'}" clearable></el-cascader>
+          <el-cascader v-model="value[item.prop]" :options="item.options" :props="{ checkStrictly: true , value : item.params.value, label :  item.params.label,}" clearable></el-cascader>
+        </el-form-item>
+        <el-form-item v-else-if="item.type === 'radio'" v-bind="item">
+          <el-radio-group v-model="value[item.prop]">
+            <el-radio v-for="(item,index) in item.options" :key="index" :label="item.label" :value="item.value"></el-radio>
+          </el-radio-group>
         </el-form-item>
       </template>
 

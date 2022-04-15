@@ -6,6 +6,8 @@
 
     <el-table
       ref="multipleTable"
+      :row-key="tree.row_id"
+      :tree-props = "tree.tree_props"
       :data="tableData"
       tooltip-effect="dark"
       style="width: 100%"
@@ -26,7 +28,8 @@
       </template>
     </el-table>
 
-    <el-pagination @current-change="handleCurrentChange" :page-size="pager.pageSize" :current-page="pager.pageNum" background layout="prev, pager, next" :total="pager.total"></el-pagination>
+    <el-pagination v-if="pagination" @current-change="handleCurrentChange" :page-size="pager.pageSize" :current-page="pager.pageNum" background layout="prev, pager, next" :total="pager.total"></el-pagination>
+
   </div>
 </template>
 
@@ -34,6 +37,10 @@
 export default {
   name: "BaseTable",
   props : {
+    tree : {
+      type : Object,
+      default : {}
+    },
     columns : {
       type : Array,
       default : []
@@ -45,7 +52,8 @@ export default {
     pager : {
       type : Object,
       default : {}
-    }
+    },
+    pagination : Boolean
   },
   methods : {
     handleCurrentChange(val){
