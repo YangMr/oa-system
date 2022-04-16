@@ -12,6 +12,16 @@ const rolesAllList = ()=>{
   return request({url : "/roles/allList",method : "GET"})
 }
 
+const roleList = (data)=>{
+  return request({url : "/roles/list", method : "GET" , data})
+}
+
+const actionRole = (data)=>{
+  return request({url : "/roles/operate", method : "POST", data})
+}
+
 export default {
-  rolesAllList
+  rolesAllList,
+  roleList,
+  actionRole
 }

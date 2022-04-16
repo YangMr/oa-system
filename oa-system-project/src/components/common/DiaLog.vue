@@ -25,6 +25,9 @@
         <el-form-item v-else-if="item.prop === 'menuState'" v-bind="item">
           <el-radio v-model="value[item.prop]" v-for="(mitem,index) in item.options"  :key="index" :label="mitem.value">{{mitem.label}}</el-radio>
         </el-form-item>
+        <el-form-item v-else-if="item.type === 'textarea'" v-bind="item">
+          <el-input type="textarea" v-model="value[item.prop]"></el-input>
+        </el-form-item>
       </template>
 
 

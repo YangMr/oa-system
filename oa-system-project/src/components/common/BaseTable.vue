@@ -39,19 +39,27 @@ export default {
   props : {
     tree : {
       type : Object,
-      default : {}
+      default : ()=>{
+        return {}
+      }
     },
     columns : {
       type : Array,
-      default : []
+      default : ()=>{
+        return []
+      }
     },
     tableData : {
       type : Array,
-      default : []
+      default : ()=>{
+        return []
+      }
     },
     pager : {
       type : Object,
-      default : {}
+      default :  ()=>{
+        return {}
+      }
     },
     pagination : Boolean
   },
