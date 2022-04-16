@@ -20,8 +20,13 @@ const actionRole = (data)=>{
   return request({url : "/roles/operate", method : "POST", data})
 }
 
+const settingRole = (data)=>{
+  return request({url : "/roles/update/permission", method : "POST", data})
+}
+
 export default {
   rolesAllList,
   roleList,
-  actionRole
+  actionRole,
+  settingRole
 }
